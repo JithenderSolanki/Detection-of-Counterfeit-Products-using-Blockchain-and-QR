@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANUFACTURER</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+	
+	
+	<style>
+		body {
+			background-image: url("{{ url_for('static', filename='pic5.jpeg') }}");
+			background-repeat: no-repeat;
+			background-size: cover;
+			 
+		}
+		#hash{
+			margin-top: 20px;
+			 
+			text-align: center;
+			 
+		}
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center ;color:blue"><u>Identification of Counterfeit Products Using Blockchain</u></h1> 
+    <br>
+    <h2 style="text-align: center "> Add Product Details</h2>
+    <hr>
+    <div style="text-align: center" >
+		<form action="/generate" method="post"  >
+		<label for="company">company:</label>
+		<input type="text" id="company" name="company" required><br><br>
+
+		<label for="branch">Branch:</label>
+        <input type="text" id="branch" name="branch" required><br><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="id">Id number:</label>
+        <input type="text" id="id" name="id" required><br><br>
+
+		<label for="type1">Type:</label>
+        <input type="text" id="type1" name="type1" required><br><br>
+
+		<label for="date1">Manufacture date:</label>
+        <input type="date" id="date1" name="date1" required><br><br>
+
+		
+
+  
+		<button type="button" onclick="calculateSHA256()">create new block</button><br><br><br>
+        <input type="submit" value="Generate QR code">
+
+		
+
+		
+        </form>
+	  </div> <br><br>
+	  <div id="hash">
+
+	  </div><br><br>
+
+	  <div id="success-message" style="display: none;">
+		<h3 style="text-align:center">Qr code generated succesfully </h3>
+		 
+	</div>
+     
+     
+    <script type="text/javascript">
+     
+	    let web3= new Web3(new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545"));  
+        var abi =[
+		{
+			"inputs": [
+				{
+					"internalType": "bytes32",
+					"name": "ProductHash",
+					"type": "bytes32"
+				},
+				{
+					"internalType": "string",
+					"name": "Pcompany",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "Pbranch",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "Pname",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "Pid",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "Ptype1",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "Pdate1",
+					"type": "string"
+				}
+			],
+			"name": "addProduct",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "bytes32",
+					"name": "ProductHash",
+					"type": "bytes32"
+				}
+			],
+			"name": "getProductInfo",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "",
+					"type": "string"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "bytes32",
+					"name": "ProductHash",
+					"type": "bytes32"
+				}
+			],
+			"name": "isProductVerified",
+			"outputs": [
+				{
+					"internalType": "bool",
+					"name": "",
+					"type": "bool"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "bytes32",
+					"name": "",
+					"type": "bytes32"
+				}
+			],
+			"name": "Products",
+			"outputs": [
+				{
+					"internalType": "bytes32",
+					"name": "hash",
+					"type": "bytes32"
+				},
+				{
+					"internalType": "string",
+					"name": "company",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "branch",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "name",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "id",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "type1",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "date1",
+					"type": "string"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		}
+	];
+        var add="{{account['add']}}";
+        let contract= new web3.eth.Contract(abi,add);
+	    var hashHex='';
+		 
+
+        function calculateSHA256() 
+		{
+
+		    var vcompany=document.getElementById('company').value;
+            var vbranch =document.getElementById('branch').value;
+			var vname=document.getElementById('name').value;
+			var vid=document.getElementById('id').value;
+			var vtype1=document.getElementById('type1').value;
+			var vdate1=document.getElementById('date1').value;
+			
+			
+	         
+            var inputString= vcompany+vbranch+vname+vid+vtype1+vdate1 
+			console.log(inputString);
+            var encoder = new TextEncoder();
+            var data1 = encoder.encode(inputString);
+            console.log(data1);
+            crypto.subtle.digest('SHA-256', data1).then(hashBuffer => {
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+			hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+			hashHex = '0x'+ hashHex;
+			console.log(hashHex);
+			document.getElementById('hash').innerHTML="<h4>Generated Hash:</h4>"+hashHex
+			//console.log(vcompany+branch+vname+id+type1+date1);
+			const gasLimit = 800000;
+			contract.methods.addProduct(hashHex, vcompany,vbranch, vname, vid, vtype1, vdate1).send({from:"{{account['from']}}",gas: gasLimit});
+			document.getElementById('company').value=vcompany;
+		    document.getElementById('branch').value=vbranch;
+			document.getElementById('name').value=vname;
+			document.getElementById('id').value=vid;
+			document.getElementById('type1').value=vtype1;
+			document.getElementById('date1').value=vdate1;
+
+			}).catch(ex => console.error(ex));
+		}
+    </script>
+	<script>
+		 
+		//const successMessage = document.getElementById("success-message");
+		//successMessage.style.display = "none";
+
+		// Add an event listener to the form submission
+		//const form = document.querySelector("form");
+		//form.addEventListener("submit", (event) => {
+			// Prevent the default form submission behavior
+			//event.preventDefault();
+
+			// Show the success message
+			//successMessage.style.display = "block";
+
+			 
+	//	});
+	</script>
+</body>
+</html>
