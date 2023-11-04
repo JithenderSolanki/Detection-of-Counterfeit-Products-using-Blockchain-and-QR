@@ -12,5 +12,8 @@ authenticity. The QR Code can be protected from multiple scans using a scratch-o
 revealing the code after the scratch-off material has been removed. The system has the potential to 
 significantly reduce the prevalence of counterfeit products, protect public health and safety, and 
 promote trust and transparency in the marketplace.
+# System Architecture
+![Architecture](https://github.com/JithenderSolanki/Detection-of-Counterfeit-Products-using-Blockchain-and-QR/assets/81504900/3633a7cc-3f31-4cb5-ad2f-23a53ae0cbe5)
+
 
 
